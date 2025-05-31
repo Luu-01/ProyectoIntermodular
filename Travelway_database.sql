@@ -1,7 +1,7 @@
 --SUBO EL ARCHIVO SQL QUE COLOQUÉ EN LA BASE DE DATOS PARA TENERLO ENCUENTA
 
 CREATE TABLE usuarios(
-  id_usuario INT,
+  id_usuario SERIAL,
   nombre VARCHAR(50),
   apellidos VARCHAR(100),
   edad INT,
@@ -9,7 +9,7 @@ CREATE TABLE usuarios(
   CONSTRAINT PK_usuarios PRIMARY KEY (id_usuario)
 );
 CREATE TABLE pasaporte(
-  id_pasaporte INT,
+  id_pasaporte SERIAL,
   numero VARCHAR(20),
   fecha_expedicion DATE,
   caducidad DATE,
@@ -22,7 +22,7 @@ CREATE TABLE pasaporte(
   );
 
 CREATE TABLE destino(
-  id_destino INT,
+  id_destino SERIAL,
   ciudad VARCHAR(100),
   pais VARCHAR(100),
   requiere_pasaporte BOOLEAN,
@@ -30,7 +30,7 @@ CREATE TABLE destino(
 );
 
 CREATE TABLE guia(
-  id_guia INT,
+  id_guia SERIAL,
   nombre VARCHAR(50),
   apellidos VARCHAR(100),
   especialidad VARCHAR(100),
@@ -42,7 +42,7 @@ CREATE TABLE guia(
 );
 
 CREATE TABLE hace_reserva(
-  id_reserva INT,
+  id_reserva SERIAL,
   id_usuario INT,
   id_destino INT,
   fecha_reserva DATE,

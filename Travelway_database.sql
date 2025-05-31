@@ -57,3 +57,6 @@ ADD username VARCHAR(30);
 
 ALTER TABLE usuarios
 ADD password VARCHAR (30);
+
+ALTER TABLE pasaporte
+ADD creado_por INT;

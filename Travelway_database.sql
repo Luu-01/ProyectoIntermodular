@@ -51,3 +51,9 @@ CREATE TABLE hace_reserva(
   CONSTRAINT FK_hace_reserva_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios,
   CONSTRAINT FK_hace_reserva_destino FOREIGN KEY (id_destino) REFERENCES destino
 );
+
+ALTER TABLE usuarios
+ADD username VARCHAR(30);
+
+ALTER TABLE usuarios
+ADD password VARCHAR (30);

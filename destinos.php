@@ -1,5 +1,9 @@
 <?php 
 include 'database.php'; 
+// Recuperamos todos los destinos de la base de datos
+$stmt = $pdo->query("SELECT * FROM destinos"); // Aquí hacemos la consulta para obtener los destinos
+$destinos = $stmt->fetchAll(PDO::FETCH_ASSOC); // Obtenemos los resultados como un array asociativo
+?>
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,8 +21,8 @@ include 'database.php';
                 <ul>
                     <li><a href="index.php">Inicio</a></li>
                     <li><a href="create.php">Creación de Destinos</a></li>
-                    <li> <a href="login.php">Identificación</a><li>
-                    <li><a href="createguide.php">Creacion de Guía</a></li>
+                    <li><a href="login.php">Identificación</a></li>
+                    <li><a href="createguide.php">Creación de Guía</a></li>
                 </ul>
             </nav>
             <h1>Explora Nuestros Destinos</h1>
@@ -26,16 +30,28 @@ include 'database.php';
         </header>
 
         <section id="destinos">
-            <!--mostramos los diferentes campos de los destinos-->
             <h2>Nuestros Destinos</h2>
-          <tr>
-          <td><?= htmlspecialchars($destino['username']) ?></td> 
-          <td><?= htmlspecialchars($destino['password']) ?></td>
-          <td><?= htmlspecialchars($destino['pasaporte']) ?></td>
-          <td><?= $destino['created_por'] ?></td>
-          <td>
-          </td> <!--me falta poner quienes están inscritos-->
-          </tr>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Pasaporte</th>
+                        <th>Creado por</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($destinos as $destino): ?> <!-- por cada destino que tengamos en el array-->
+                        <tr>
+                            <td><?= htmlspecialchars($destino['nombre']) ?></td> <!--lo colocamos en esta tabla-->
+                            <td><?= htmlspecialchars($destino['descripcion']) ?></td>
+                            <td><?= htmlspecialchars($destino['pasaporte']) ?></td>
+                            <td><?= htmlspecialchars($destino['created_por']) ?></td>
+                            <td>
+                            </td>
+                            <!--me falta poner los que estén suscritos porque aun no está el formulario de inscripción-->
+                        </tr>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </section>

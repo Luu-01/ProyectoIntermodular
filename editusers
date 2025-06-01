@@ -1,0 +1,160 @@
+<?php
+session_start();
+include 'database.php';
+
+//RECUPERAMOS EL USUARIO DESDE LA BASE DE DATOS
+$id_usuario = $_GET['id']; //me gustaria poner que detectase si el usuario está  conectado o no pero ni idea de como hacerlo
+$stmt1 = $pdo->prepare("SELECT * FROM usuario WHERE id = ?");
+$stmt1->execute([$id]);
+$usuarios = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+
+//RECUPERAMOS EL PASAPORTE
+$stmt2 = $pdo->prepare("SELECT * FROM pasaporte WHERE id_usuario = ?");  //recuperamos el pasaporte que tenga el id del usuario sea el mismo al nuestro
+$stmt2->execute([$id_usuario]);
+$pasaporte = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+//validacion de errores por parte del servidor
+
+    $errores = [];
+    if (empty($numero)) {
+        $errores[] = "El número de pasaporte es obligatorio.";
+    }
+    if (empty($fechaExpedicion)) {
+        $errores[] = "La fecha de expedición es obligatoria.";
+    }
+    if (empty($caducidad)) {
+        $errores[] = "La fecha de caducidad es obligatoria.";
+    }
+  
+    if (empty($errores)) {
+        if ($pasaporte) {
+            // Si ya existe un pasaporte, lo actualizamos :D
+            $Update = $pdo->prepare("UPDATE pasaporte SET numero = ?, fecha_expedicion = ?, caducidad = ? WHERE usuario_id = ?");
+            $Update->execute([$numero, $fechaExpedicion, $caducidad, $usuario_id]);
+        } else {
+            // Si no existe un pasaporte, lo insertamos :D
+            $Insert = $pdo->prepare("INSERT INTO pasaporte (usuario_id, numero, fecha_expedicion, caducidad) VALUES (?, ?, ?, ?)");
+            $Insert->execute([$usuario_id, $numero, $fechaExpedicion, $caducidad]);
+        }
+        // Redirigir después de insertar o actualizar
+        header("Location: ver_usuario.php?id=" . $usuario_id);
+        exit;
+    }
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Usuario - Agencia de Viajes</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <nav class="navbar">
+                <ul>
+                    <li><a href="index.php">Inicio</a></li>
+                    <li><a href="create.php">Creación de Destinos</a></li>
+                    <li><a href="login.php">Identificación</a></li>
+                    <li><a href="createguide.php">Creación de Guía</a></li>
+                </ul>
+            </nav>
+            <h1>Ver Usuario</h1>
+        </header>
+
+        <section id="ver_usuario">
+            <h2>Detalles del Usuario</h2> <!--se muestran los datos del usuario-->
+            <p><strong>Nombre de usuario:</strong> <?= htmlspecialchars($usuario['username']) ?></p>
+            <p><strong>Nombre:</strong> <?= htmlspecialchars($usuario['nombre']) ?></p>
+            <p><strong>Apellidos:</strong> <?= htmlspecialchars($usuario['apellidos']) ?></p>
+            <p><strong>Edad:</strong> <?= htmlspecialchars($usuario['edad']) ?></p>
+            <p><strong>Email:</strong> <?= htmlspecialchars($usuario['email']) ?></p>
+
+            <h3>Pasaporte</h3>
+            <?php if (!empty($errores)): ?> <!-- Div en el que se muestran los errores de parte del servidor si los hay, si el array está vacío (es decir que no hay errores), no mostrará nada -->
+                <div class="erroresphp">
+                    <?php foreach ($errores as $error): ?>
+                        <p style="color: red;"><?= htmlspecialchars($error) ?></p>
+                    <?php endforeach; ?>
+                    <?php unset($_SESSION['errores']); ?>
+                    </div>
+            <?php endif; ?>
+            <form action="" method="POST">
+                <h4>Formulario para Crear o Editar Pasaporte</h4>
+                <label for="numero">Número de Pasaporte:</label>
+                <input type="text" name="numero" id="numero" value="<?= $pasaporte ? htmlspecialchars($pasaporte['numero']) : '' ?>"> 
+                <!--el value hace que muestre los datos de la tabla pasaporte-->
+                <!--si no existe, aparece vacío-->
+                <div class="error" id="error-numpass"></div>
+                <label for="fechaexpedicion">Fecha de Expedición:</label>
+                <input type="date" name="fechaexpedicion" id="fechaexpedicion" value="<?= $pasaporte ? htmlspecialchars($pasaporte['fecha_expedicion']) : '' ?>">
+                <div class="error" id="error-fechaex"></div>
+
+                <label for="caducidad">Fecha de Caducidad:</label>
+                <input type="date" name="caducidad" id="caducidad" value="<?= $pasaporte ? htmlspecialchars($pasaporte['caducidad']) : '' ?>" >
+                <div class="error" id="error-caducidad"></div>
+
+                <button id="enviar" type="button">Guardar</button> <!--hacemos un boton type Button para controlar cuando enviar el formulario -->
+            </form>
+
+            
+        </section>
+
+        <footer>
+            <p>© 2025 Agencia de Viajes. Todos los derechos reservados.</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </footer>
+    </div>
+
+  <script>
+
+    //SCRIPTS  PARA EL CONTROL DEL FORMULARIO (ERRORES Y DEMÁS)
+        let pasaporte = document.getElementById("pasaporte");
+        let numero = document.getElementById("numero");
+        let fechaexpedicion = document.getElementById("fechaexpedicion");
+        let caducidad = document.getElementById("caducidad");
+
+        let error_pasaporte = document.getElementById("error-pasaporte");
+        let error_numpass = document.getElementById("error-numpass");
+        let error_fechaex = document.getElementById("error-fechaex");
+        let error_caducidad = document.getElementById("error-caducidad");
+
+        //funcion para validar el formulario
+         function validar(){
+          esvaido = true; 
+          if (numero.value.trim() === '') {
+                esvalido = false;
+                error_numpass.textContent = "Debe indicar el número de pasaporte.";
+            }
+            if (fechaexpedicion.value.trim() === '') {
+                esvalido = false;
+                error_fechaex.textContent = "Debe indicar la fecha de expedición.";
+            }
+            if (caducidad.value.trim() === '') {
+                esvalido = false;
+                error_caducidad.textContent = "Debe indicar la fecha de caducidad.";
+            }
+            return esvalido;
+      }
+
+      enviar.addEventListener('click', e=>{
+              e.preventDefault();
+            if (validar()){ //si validar sale true lo envia, si sale false (que tiene un error) no
+                formulario.submit();
+
+            }
+         });
+
+  </script>
+</body>
+</html>

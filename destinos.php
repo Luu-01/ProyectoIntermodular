@@ -29,8 +29,8 @@ include 'database.php';
             <!--mostramos los diferentes campos de los destinos-->
             <h2>Nuestros Destinos</h2>
           <tr>
-          <td><?= htmlspecialchars($destino['username']) ?></td> 
-          <td><?= htmlspecialchars($destino['password']) ?></td>
+          <td><?= htmlspecialchars($destino['pais']) ?></td> 
+          <td><?= htmlspecialchars($destino['ciudad']) ?></td>
           <td><?= htmlspecialchars($destino['pasaporte']) ?></td>
           <td><?= $destino['created_por'] ?></td>
           <td>
